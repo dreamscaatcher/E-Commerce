@@ -142,6 +142,8 @@ export default function ProductSearch({
             border: "1px solid #ccc",
             borderRadius: "8px",
             fontSize: "1rem",
+            background: "var(--background)",
+            color: "var(--foreground)",
           }}
         />
         <select
@@ -153,7 +155,8 @@ export default function ProductSearch({
             border: "1px solid #ccc",
             borderRadius: "8px",
             fontSize: "1rem",
-            background: "white",
+            background: "var(--background)",
+            color: "var(--foreground)",
           }}
         >
           <option value="">All products</option>
@@ -235,7 +238,7 @@ export default function ProductSearch({
                 ) : null}
                 <a
                   href={productIdString ? `/products/${productIdString}` : "/products"}
-                  style={{ textDecoration: "none", color: "black" }}
+                  style={{ textDecoration: "none", color: "inherit" }}
                 >
                   <h2 style={{ margin: 0 }}>{safeName}</h2>
                 </a>

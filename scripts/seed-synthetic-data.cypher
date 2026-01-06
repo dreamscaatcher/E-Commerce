@@ -20,7 +20,7 @@
 WITH
   60 AS productCount,
   ['Home', 'Clothing', 'Electronics', 'Books', 'Beauty', 'Sports'] AS categories
-MATCH (p:Product)
+OPTIONAL MATCH (p:Product)
 WITH productCount, categories, coalesce(max(toInteger(p.ProductID)), 0) AS maxId
 WITH productCount, categories, maxId + 1 AS startId
 UNWIND range(startId, startId + productCount - 1) AS productId
@@ -46,7 +46,7 @@ RETURN count(*) AS productsCreated;
 WITH
   25 AS customerCount,
   ['Berlin', 'Munich', 'Hamburg', 'Cologne', 'Frankfurt'] AS cities
-MATCH (c:Customer)
+OPTIONAL MATCH (c:Customer)
 WITH customerCount, cities, coalesce(max(toInteger(c.CustomerID)), 0) AS maxId
 WITH customerCount, cities, maxId + 1 AS startId
 UNWIND range(startId, startId + customerCount - 1) AS customerId
@@ -73,7 +73,7 @@ WITH
   40 AS orderCount,
   5 AS maxItemsPerOrder,
   ['DEV_CARD', 'DEV_CASH', 'DEV_BANK'] AS paymentMethods
-MATCH (o:Order)
+OPTIONAL MATCH (o:Order)
 WITH
   orderCount,
   maxItemsPerOrder,
@@ -84,7 +84,7 @@ WITH
   maxItemsPerOrder,
   paymentMethods,
   maxOrderId + 1 AS orderStart
-MATCH (p:Payment)
+OPTIONAL MATCH (p:Payment)
 WITH
   orderCount,
   maxItemsPerOrder,
@@ -97,15 +97,15 @@ WITH
   paymentMethods,
   orderStart,
   maxPaymentId + 1 AS paymentStart
-MATCH (c:Customer)
+OPTIONAL MATCH (c:Customer)
 WITH
   orderCount,
   maxItemsPerOrder,
   paymentMethods,
   orderStart,
   paymentStart,
-  collect(c) AS customers
-MATCH (prod:Product)
+  [customer IN collect(c) WHERE customer IS NOT NULL] AS customers
+OPTIONAL MATCH (prod:Product)
 WITH
   orderCount,
   maxItemsPerOrder,
@@ -113,7 +113,7 @@ WITH
   orderStart,
   paymentStart,
   customers,
-  collect(prod) AS products
+  [product IN collect(prod) WHERE product IS NOT NULL] AS products
 WITH
   orderCount,
   maxItemsPerOrder,

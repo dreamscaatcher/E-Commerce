@@ -18,6 +18,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Neo4j Aura setup
+
+Set these server-side env vars (see `.env.example`) to point the app at Aura:
+
+```bash
+NEO4J_URI=neo4j+s://<your-db-id>.databases.neo4j.io
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=<your-password>
+```
+
+## Seed synthetic data
+
+- In Neo4j Browser / Neo4j VS Code extension: run `scripts/seed-synthetic-data.cypher`
+- From the CLI (uses `.env.local`): `npm run seed` (add `-- --wipe` to clear the DB first)
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

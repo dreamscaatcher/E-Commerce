@@ -49,9 +49,9 @@ export default function AddToCartButton({
         marginTop: "0.75rem",
         padding: "0.55rem 0.9rem",
         borderRadius: "10px",
-        border: "1px solid #111",
-        background: wasAdded ? "#16a34a" : "#111",
-        color: "#fff",
+        border: `1px solid ${wasAdded ? "#16a34a" : "var(--foreground)"}`,
+        background: wasAdded ? "#16a34a" : "var(--foreground)",
+        color: wasAdded ? "#fff" : "var(--background)",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.55 : 1,
         fontWeight: 600,
@@ -61,4 +61,3 @@ export default function AddToCartButton({
     </button>
   );
 }
-
