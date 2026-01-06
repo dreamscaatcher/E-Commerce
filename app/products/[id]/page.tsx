@@ -1,9 +1,24 @@
 import React from "react";
 import Link from "next/link";
+import { headers } from "next/headers";
 import AddToCartButton from "@/app/components/AddToCartButton";
 
-async function getProduct(id: string) {
-  const res = await fetch(`http://localhost:3000/api/products/${id}`, {
+async function getBaseUrl() {
+  const appUrl = process.env.APP_URL?.trim();
+  if (appUrl) return appUrl.replace(/\/+$/, "");
+
+  const headerStore = await headers();
+  const proto = headerStore.get("x-forwarded-proto") ?? "http";
+  const host =
+    headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "";
+  if (!host) return "http://localhost:3000";
+  return `${proto}://${host}`;
+}
+
+async function getProduct(baseUrl: string, id: string) {
+  const safeId = encodeURIComponent(id);
+  const url = new URL(`/api/products/${safeId}`, baseUrl);
+  const res = await fetch(url, {
     cache: "no-store",
   });
   return res.json();
@@ -15,7 +30,7 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { product } = await getProduct(id);
+  const { product } = await getProduct(await getBaseUrl(), id);
 
   if (!product) {
     return <div style={{ padding: "2rem" }}>Product not found.</div>;

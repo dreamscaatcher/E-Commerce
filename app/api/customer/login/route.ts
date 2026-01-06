@@ -30,6 +30,9 @@ export async function POST(request: Request) {
     );
   }
 
+  const emailVerificationDisabled =
+    process.env.DISABLE_EMAIL_VERIFICATION === "true";
+
   let body: unknown;
   try {
     body = await request.json();
@@ -89,7 +92,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (props.EmailVerified !== true) {
+    if (!emailVerificationDisabled && props.EmailVerified !== true) {
       return NextResponse.json(
         { error: "Please verify your email before logging in." },
         { status: 403 }

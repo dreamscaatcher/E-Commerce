@@ -28,6 +28,10 @@ NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=<your-password>
 ```
 
+## Email verification (optional)
+
+If you don’t have SMTP set up yet, set `DISABLE_EMAIL_VERIFICATION=true` to allow customer login without email confirmation.
+
 ## Seed synthetic data
 
 - In Neo4j Browser / Neo4j VS Code extension: run `scripts/seed-synthetic-data.cypher`

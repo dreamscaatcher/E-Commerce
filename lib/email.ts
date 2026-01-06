@@ -25,14 +25,21 @@ function getSmtpConfig() {
   return { host, port, secure, user, pass, from };
 }
 
+export function isSmtpConfigured() {
+  return Boolean(getSmtpConfig());
+}
+
 let cachedTransport: nodemailer.Transporter | null = null;
 let cachedFrom: string | null = null;
 
 export async function sendEmail(message: EmailMessage) {
   const config = getSmtpConfig();
   if (!config) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[email:dev] SMTP not configured. Email contents:");
+    const emailVerificationDisabled =
+      process.env.DISABLE_EMAIL_VERIFICATION === "true";
+
+    if (process.env.NODE_ENV !== "production" || emailVerificationDisabled) {
+      console.log("[email] SMTP not configured. Email contents:");
       console.log(message.text);
       return;
     }
@@ -59,4 +66,3 @@ export async function sendEmail(message: EmailMessage) {
     html: message.html,
   });
 }
-

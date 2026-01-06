@@ -4,7 +4,7 @@ import crypto from "crypto";
 import neo4j from "neo4j-driver";
 import { isAdminRequest } from "@/lib/admin/auth";
 import { hashCustomerPassword } from "@/lib/customer/password";
-import { sendEmail } from "@/lib/email";
+import { isSmtpConfigured, sendEmail } from "@/lib/email";
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI!,
@@ -56,6 +56,22 @@ export async function POST(request: NextRequest) {
   }
 
   const appUrl = process.env.APP_URL || request.nextUrl.origin;
+  const emailVerificationDisabled =
+    process.env.DISABLE_EMAIL_VERIFICATION === "true";
+
+  if (
+    !emailVerificationDisabled &&
+    process.env.NODE_ENV === "production" &&
+    !isSmtpConfigured()
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "SMTP is not configured. Set SMTP_* env vars or set DISABLE_EMAIL_VERIFICATION=true.",
+      },
+      { status: 503 }
+    );
+  }
 
   const data = body as Record<string, unknown>;
   const nameRaw = (data.Name ?? data.name) as unknown;
@@ -122,14 +138,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const verificationToken = crypto.randomBytes(32).toString("base64url");
-  const verificationTokenHash = crypto
-    .createHash("sha256")
-    .update(verificationToken)
-    .digest("hex");
-  const verificationExpiresAt = new Date(
-    Date.now() + 1000 * 60 * 60 * 24
-  ).toISOString();
+  const verificationToken = emailVerificationDisabled
+    ? ""
+    : crypto.randomBytes(32).toString("base64url");
+  const verificationTokenHash = emailVerificationDisabled
+    ? ""
+    : crypto.createHash("sha256").update(verificationToken).digest("hex");
+  const verificationExpiresAt = emailVerificationDisabled
+    ? ""
+    : new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
 
   const session = driver.session();
   try {
@@ -155,81 +172,131 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await session.run(
-        `
-        MATCH (c:Customer)
-        WHERE toLower(c.Email) = $email
-        SET c.EmailVerificationTokenHash = $verificationTokenHash,
-            c.EmailVerificationExpiresAt = datetime($verificationExpiresAt),
-            c.EmailVerified = false,
-            c.ShippingAddress = $shippingAddress
-        RETURN c
-        `,
-        {
-          email,
-          verificationTokenHash,
-          verificationExpiresAt,
-          shippingAddress,
-        }
-      );
+      if (emailVerificationDisabled) {
+        await session.run(
+          `
+          MATCH (c:Customer)
+          WHERE toLower(c.Email) = $email
+          SET c.EmailVerified = true,
+              c.EmailVerifiedAt = datetime(),
+              c.ShippingAddress = $shippingAddress
+          REMOVE c.EmailVerificationTokenHash
+          REMOVE c.EmailVerificationExpiresAt
+          RETURN c
+          `,
+          { email, shippingAddress }
+        );
+      } else {
+        await session.run(
+          `
+          MATCH (c:Customer)
+          WHERE toLower(c.Email) = $email
+          SET c.EmailVerificationTokenHash = $verificationTokenHash,
+              c.EmailVerificationExpiresAt = datetime($verificationExpiresAt),
+              c.EmailVerified = false,
+              c.ShippingAddress = $shippingAddress
+          RETURN c
+          `,
+          {
+            email,
+            verificationTokenHash,
+            verificationExpiresAt,
+            shippingAddress,
+          }
+        );
 
+        const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(
+          verificationToken
+        )}`;
+        await sendEmail({
+          to: email,
+          subject: "Confirm your email",
+          text: `Please confirm your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, you can ignore this email.`,
+        });
+      }
+
+      return NextResponse.json({
+        ok: true,
+        emailVerified: emailVerificationDisabled,
+      });
+    }
+
+    const passwordHash = await hashCustomerPassword(password);
+
+    const result = emailVerificationDisabled
+      ? await session.run(
+          `
+          MATCH (c:Customer)
+          WITH coalesce(max(toInteger(c.CustomerID)), 0) AS maxId
+          CREATE (customer:Customer {
+            CustomerID: maxId + 1,
+            Name: $name,
+            Email: $email,
+            PasswordHash: $passwordHash,
+            EmailVerified: true,
+            EmailVerifiedAt: datetime(),
+            Phone: $phone,
+            City: $city,
+            ShippingAddress: $shippingAddress,
+            CreatedAt: datetime()
+          })
+          RETURN customer.CustomerID AS CustomerID
+          `,
+          {
+            name,
+            email,
+            passwordHash,
+            phone: phone || null,
+            city: city || null,
+            shippingAddress,
+          }
+        )
+      : await session.run(
+          `
+          MATCH (c:Customer)
+          WITH coalesce(max(toInteger(c.CustomerID)), 0) AS maxId
+          CREATE (customer:Customer {
+            CustomerID: maxId + 1,
+            Name: $name,
+            Email: $email,
+            PasswordHash: $passwordHash,
+            EmailVerified: false,
+            EmailVerificationTokenHash: $verificationTokenHash,
+            EmailVerificationExpiresAt: datetime($verificationExpiresAt),
+            Phone: $phone,
+            City: $city,
+            ShippingAddress: $shippingAddress,
+            CreatedAt: datetime()
+          })
+          RETURN customer.CustomerID AS CustomerID
+          `,
+          {
+            name,
+            email,
+            passwordHash,
+            verificationTokenHash,
+            verificationExpiresAt,
+            phone: phone || null,
+            city: city || null,
+            shippingAddress,
+          }
+        );
+
+    if (!emailVerificationDisabled) {
       const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(
         verificationToken
       )}`;
       await sendEmail({
         to: email,
         subject: "Confirm your email",
-        text: `Please confirm your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, you can ignore this email.`,
+        text: `Thanks for registering!\n\nPlease confirm your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, you can ignore this email.`,
       });
-
-      return NextResponse.json({ ok: true });
     }
-
-    const passwordHash = await hashCustomerPassword(password);
-
-    const result = await session.run(
-      `
-      MATCH (c:Customer)
-      WITH coalesce(max(toInteger(c.CustomerID)), 0) AS maxId
-      CREATE (customer:Customer {
-        CustomerID: maxId + 1,
-        Name: $name,
-        Email: $email,
-        PasswordHash: $passwordHash,
-        EmailVerified: false,
-        EmailVerificationTokenHash: $verificationTokenHash,
-        EmailVerificationExpiresAt: datetime($verificationExpiresAt),
-        Phone: $phone,
-        City: $city,
-        ShippingAddress: $shippingAddress,
-        CreatedAt: datetime()
-      })
-      RETURN customer.CustomerID AS CustomerID
-      `,
-      {
-        name,
-        email,
-        passwordHash,
-        verificationTokenHash,
-        verificationExpiresAt,
-        phone: phone || null,
-        city: city || null,
-        shippingAddress,
-      }
-    );
-
-    const verifyUrl = `${appUrl}/verify-email?token=${encodeURIComponent(
-      verificationToken
-    )}`;
-    await sendEmail({
-      to: email,
-      subject: "Confirm your email",
-      text: `Thanks for registering!\n\nPlease confirm your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, you can ignore this email.`,
-    });
 
     const customerId = result.records[0]?.get("CustomerID") ?? null;
     return NextResponse.json({
       ok: true,
+      emailVerified: emailVerificationDisabled,
       customerId: JSON.parse(JSON.stringify(customerId)),
     });
   } catch (error) {
