@@ -89,7 +89,7 @@ export default async function AdminAnalyticsPage() {
       <h1 style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>
         Admin Analytics
       </h1>
-      <p style={{ marginTop: 0, marginBottom: "1.5rem", color: "#444" }}>
+      <p style={{ marginTop: 0, marginBottom: "1.5rem", color: "var(--muted-foreground)" }}>
         Choose a visualization to explore your Neo4j data.
       </p>
 

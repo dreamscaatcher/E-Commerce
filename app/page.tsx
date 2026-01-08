@@ -151,6 +151,7 @@ export default async function HomePage() {
           border: "1px solid #eee",
           borderRadius: "12px",
           background: "#fafafa",
+          color: "#111",
         }}
       >
         <h1 style={{ fontSize: "2.25rem", margin: 0 }}>
@@ -194,7 +195,9 @@ export default async function HomePage() {
         </h2>
 
         {categorySections.length === 0 ? (
-          <div style={{ color: "#444" }}>No products found.</div>
+          <div style={{ color: "var(--muted-foreground)" }}>
+            No products found.
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             {categorySections.map((section) => {

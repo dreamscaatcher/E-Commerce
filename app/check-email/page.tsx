@@ -26,17 +26,17 @@ export default async function CheckEmailPage({
         {emailVerificationDisabled ? "You're all set" : "Confirm your email"}
       </h1>
       {emailVerificationDisabled ? (
-        <p style={{ marginTop: 0, color: "#444" }}>
+        <p style={{ marginTop: 0, color: "var(--muted-foreground)" }}>
           Email verification is disabled, so you can log in immediately
           {email ? ` as ${email}` : ""}.
         </p>
       ) : (
         <>
-          <p style={{ marginTop: 0, color: "#444" }}>
+          <p style={{ marginTop: 0, color: "var(--muted-foreground)" }}>
             We sent a confirmation link{email ? ` to ${email}` : ""}. Please open
             your email and click the link to verify your account.
           </p>
-          <p style={{ color: "#444" }}>
+          <p style={{ color: "var(--muted-foreground)" }}>
             If you don’t see it, check your spam/junk folder.
           </p>
           {!smtpConfigured && process.env.NODE_ENV !== "production" ? (

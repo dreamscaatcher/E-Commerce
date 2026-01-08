@@ -40,6 +40,7 @@ export default function AdminProductsToolbar() {
             borderRadius: "8px",
             border: "1px solid #ccc",
             background: "#fff",
+            color: "#111",
             cursor: "pointer",
           }}
         >

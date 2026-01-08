@@ -46,36 +46,48 @@ export default function MonthlySalesBarChart({
 
     const top = trimmed[0];
 
-    let running = 0;
-    const waterfall = trimmed.map((entry) => {
-      const start = running;
+    const waterfall = trimmed.reduce<
+      {
+        label: string;
+        start: number;
+        value: number;
+        total: number;
+        payments: number;
+        cumulative: number;
+        isTotal: boolean;
+      }[]
+    >((acc, entry) => {
+      const start = acc.length > 0 ? acc[acc.length - 1]!.cumulative : 0;
       const value = entry.total;
-      running += value;
-      return {
+      const cumulative = start + value;
+      return acc.concat({
         label: entry.month,
         start,
         value,
         total: entry.total,
         payments: entry.payments,
-        cumulative: running,
+        cumulative,
         isTotal: false,
-      };
-    });
-
-    if (waterfall.length > 0) {
-      waterfall.push({
-        label: "Total",
-        start: 0,
-        value: running,
-        total: running,
-        payments: trimmed.reduce((sum, entry) => sum + entry.payments, 0),
-        cumulative: running,
-        isTotal: true,
       });
-    }
+    }, []);
+
+    const running = waterfall.length > 0 ? waterfall[waterfall.length - 1]!.cumulative : 0;
+    const paymentsTotal = trimmed.reduce((sum, entry) => sum + entry.payments, 0);
+    const fullData =
+      waterfall.length > 0
+        ? waterfall.concat({
+            label: "Total",
+            start: 0,
+            value: running,
+            total: running,
+            payments: paymentsTotal,
+            cumulative: running,
+            isTotal: true,
+          })
+        : waterfall;
 
     return {
-      chartData: waterfall,
+      chartData: fullData,
       highestMonth: top
         ? { month: top.month, total: top.total, payments: top.payments }
         : null,
@@ -104,6 +116,7 @@ export default function MonthlySalesBarChart({
         border: "1px solid #eee",
         borderRadius: "12px",
         background: "#fff",
+        color: "#111",
         padding: "1rem",
       }}
     >

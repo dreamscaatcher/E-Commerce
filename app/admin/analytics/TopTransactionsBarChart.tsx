@@ -79,6 +79,7 @@ export default function TopTransactionsBarChart({
         border: "1px solid #eee",
         borderRadius: "12px",
         background: "#fff",
+        color: "#111",
         padding: "1rem",
       }}
     >
@@ -139,4 +140,3 @@ export default function TopTransactionsBarChart({
     </div>
   );
 }
-

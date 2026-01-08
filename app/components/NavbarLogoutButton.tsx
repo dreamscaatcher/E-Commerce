@@ -28,6 +28,7 @@ export default function NavbarLogoutButton() {
         borderRadius: "8px",
         border: "1px solid #ccc",
         background: "#fff",
+        color: "#111",
         cursor: loading ? "not-allowed" : "pointer",
       }}
     >
@@ -35,4 +36,3 @@ export default function NavbarLogoutButton() {
     </button>
   );
 }
-

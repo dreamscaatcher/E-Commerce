@@ -53,6 +53,7 @@ export default function CustomerCityBarChart({ data }: { data: CityCount[] }) {
         border: "1px solid #eee",
         borderRadius: "12px",
         background: "#fff",
+        color: "#111",
         padding: "1rem",
       }}
     >
@@ -93,4 +94,3 @@ export default function CustomerCityBarChart({ data }: { data: CityCount[] }) {
     </div>
   );
 }
-

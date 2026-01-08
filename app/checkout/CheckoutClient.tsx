@@ -174,7 +174,7 @@ export default function CheckoutClient({
   if (items.length === 0) {
     return (
       <div>
-        <p style={{ color: "#444" }}>
+        <p style={{ color: "var(--muted-foreground)" }}>
           Your cart is empty. Add some products before checking out.
         </p>
         <Link
@@ -208,6 +208,7 @@ export default function CheckoutClient({
           borderRadius: "12px",
           border: "1px solid #eee",
           background: "#fafafa",
+          color: "#111",
         }}
       >
         <div style={{ marginBottom: "0.5rem", color: "#444" }}>
@@ -307,7 +308,7 @@ export default function CheckoutClient({
                 >
                   <Link
                     href={`/products/${encodeURIComponent(item.id)}`}
-                    style={{ color: "#111", textDecoration: "none" }}
+                    style={{ color: "inherit", textDecoration: "none" }}
                   >
                     {item.name}
                   </Link>
@@ -398,6 +399,7 @@ export default function CheckoutClient({
             borderRadius: "12px",
             border: "1px solid #eee",
             background: "#fafafa",
+            color: "#111",
             fontWeight: 700,
             whiteSpace: "nowrap",
           }}

@@ -34,6 +34,7 @@ export default function NavbarClient({
         padding: "1rem 2rem",
         borderBottom: "1px solid #eee",
         background: "#fff",
+        color: "#111",
       }}
     >
       <Link href="/" className="navLink" style={{ fontWeight: 600 }}>

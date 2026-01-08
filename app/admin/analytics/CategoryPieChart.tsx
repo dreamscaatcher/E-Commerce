@@ -69,6 +69,7 @@ export default function CategoryPieChart({ data }: { data: CategoryCount[] }) {
         border: "1px solid #eee",
         borderRadius: "12px",
         background: "#fff",
+        color: "#111",
         padding: "1rem",
       }}
     >

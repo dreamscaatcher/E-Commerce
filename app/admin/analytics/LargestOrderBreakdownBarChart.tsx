@@ -91,6 +91,7 @@ export default function LargestOrderBreakdownBarChart({
         border: "1px solid #eee",
         borderRadius: "12px",
         background: "#fff",
+        color: "#111",
         padding: "1rem",
       }}
     >
@@ -160,4 +161,3 @@ export default function LargestOrderBreakdownBarChart({
     </div>
   );
 }
-

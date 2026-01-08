@@ -7,7 +7,13 @@ export default function RegisterPage() {
       <h1 style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>
         Customer Registration
       </h1>
-      <p style={{ marginTop: 0, marginBottom: "1.5rem", color: "#444" }}>
+      <p
+        style={{
+          marginTop: 0,
+          marginBottom: "1.5rem",
+          color: "var(--muted-foreground)",
+        }}
+      >
         Register your details so the store owner can manage orders and payments
         for you.
       </p>
@@ -16,4 +22,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

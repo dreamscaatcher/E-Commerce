@@ -247,13 +247,15 @@ export function MonthlySalesBarChartThumbnail({
       .filter((entry) => entry && entry.month && entry.total > 0)
       .slice(0, 6);
 
-    let running = 0;
-    return trimmed.map((entry) => {
-      const start = running;
-      const value = entry.total;
-      running += value;
-      return { label: entry.month, start, value };
-    });
+    return trimmed.reduce<{ label: string; start: number; value: number }[]>(
+      (acc, entry) => {
+        const prev = acc.length > 0 ? acc[acc.length - 1]! : null;
+        const start = prev ? prev.start + prev.value : 0;
+        const value = entry.total;
+        return acc.concat({ label: entry.month, start, value });
+      },
+      []
+    );
   }, [data]);
 
   if (chartData.length === 0) return <EmptyThumbnail label="No sales" />;

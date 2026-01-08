@@ -20,6 +20,7 @@ export default function Footer() {
         marginTop: "auto",
         borderTop: "1px solid #eee",
         background: "#fff",
+        color: "#111",
       }}
     >
       <div
@@ -121,4 +122,3 @@ export default function Footer() {
     </footer>
   );
 }
-

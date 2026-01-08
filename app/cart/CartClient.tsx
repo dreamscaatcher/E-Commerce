@@ -37,7 +37,7 @@ export default function CartClient() {
   if (items.length === 0) {
     return (
       <div>
-        <p style={{ color: "#444" }}>Your cart is empty.</p>
+        <p style={{ color: "var(--muted-foreground)" }}>Your cart is empty.</p>
         <Link
           href="/products"
           style={{
@@ -123,7 +123,7 @@ export default function CartClient() {
                   <td style={{ padding: "0.65rem 0.5rem", borderBottom: "1px solid #f0f0f0" }}>
                     <Link
                       href={`/products/${encodeURIComponent(item.id)}`}
-                      style={{ color: "#111", textDecoration: "none" }}
+                      style={{ color: "inherit", textDecoration: "none" }}
                     >
                       {item.name}
                     </Link>
@@ -150,6 +150,7 @@ export default function CartClient() {
                           borderRadius: "8px",
                           border: "1px solid #ccc",
                           background: "#fff",
+                          color: "#111",
                           cursor: "pointer",
                         }}
                       >
@@ -168,6 +169,8 @@ export default function CartClient() {
                           padding: "0.45rem 0.5rem",
                           borderRadius: "8px",
                           border: "1px solid #ccc",
+                          background: "#fff",
+                          color: "#111",
                         }}
                       />
                       <button
@@ -180,6 +183,7 @@ export default function CartClient() {
                           borderRadius: "8px",
                           border: "1px solid #ccc",
                           background: "#fff",
+                          color: "#111",
                           cursor: "pointer",
                         }}
                       >
@@ -275,6 +279,7 @@ export default function CartClient() {
               borderRadius: "10px",
               border: "1px solid #ccc",
               background: "#fff",
+              color: "#111",
               cursor: "pointer",
             }}
           >
@@ -288,6 +293,7 @@ export default function CartClient() {
             borderRadius: "12px",
             border: "1px solid #eee",
             background: "#fafafa",
+            color: "#111",
             fontWeight: 700,
             whiteSpace: "nowrap",
           }}
