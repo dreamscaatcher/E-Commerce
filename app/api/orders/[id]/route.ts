@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import neo4j from "neo4j-driver";
-import { isAdminRequest } from "@/lib/admin/auth";
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI!,
@@ -15,10 +14,7 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const isAdmin = await isAdminRequest(request);
-  if (!isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  void request;
 
   const { id } = await context.params;
   const session = driver.session();

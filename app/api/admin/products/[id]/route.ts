@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import driver from "@/lib/neo4j";
-import { isAdminRequest } from "@/lib/admin/auth";
 
 function getFirstDefinedProperty(
   obj: Record<string, unknown>,
@@ -32,9 +31,7 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  void request;
 
   const { id } = await context.params;
   const session = driver.session();
@@ -67,10 +64,6 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id } = await context.params;
 
   let body: unknown;
@@ -154,9 +147,7 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  void request;
 
   const { id } = await context.params;
   const session = driver.session();

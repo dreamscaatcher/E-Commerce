@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import driver from "@/lib/neo4j";
-import { isAdminRequest } from "@/lib/admin/auth";
 import type { Record as Neo4jRecord } from "neo4j-driver";
 
 function toOptionalString(value: unknown): string | undefined {
@@ -19,9 +18,7 @@ function toOptionalNumber(value: unknown): number | undefined {
 }
 
 export async function GET(request: NextRequest) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  void request;
 
   const session = driver.session();
   try {
@@ -44,10 +41,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   let body: unknown;
   try {
     body = await request.json();

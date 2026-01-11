@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import neo4j from "neo4j-driver";
-import { isAdminRequest } from "@/lib/admin/auth";
 import {
   CUSTOMER_SESSION_COOKIE,
   verifyCustomerSessionToken,
@@ -15,12 +14,7 @@ const driver = neo4j.driver(
   )
 );
 
-export async function GET(request: NextRequest) {
-  const isAdmin = await isAdminRequest(request);
-  if (!isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export async function GET() {
   const session = driver.session();
 
   try {
