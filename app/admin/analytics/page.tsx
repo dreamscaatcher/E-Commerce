@@ -7,6 +7,7 @@ import {
   TopTransactionsBarChartThumbnail,
   LargestOrderBreakdownThumbnail,
   MonthlySalesBarChartThumbnail,
+  SupplyPlanningThumbnail,
 } from "./VisualizationThumbnails";
 import {
   getCategoryCounts,
@@ -81,6 +82,12 @@ export default async function AdminAnalyticsPage() {
       description: "Highest sales month (sorted desc).",
       href: "/admin/analytics/sales-by-month",
       thumbnail: <MonthlySalesBarChartThumbnail data={monthlySales} />,
+    },
+    {
+      title: "Supply Planning",
+      description: "Demand by day/week + utilization + what-if capacity.",
+      href: "/admin/analytics/supply-planning",
+      thumbnail: <SupplyPlanningThumbnail />,
     },
   ];
 

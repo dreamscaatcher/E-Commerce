@@ -33,6 +33,13 @@ export type MonthlySales = {
   payments: number;
 };
 
+export type DemandSeriesPoint = {
+  period: string;
+  orders: number;
+  items: number;
+  revenue: number;
+};
+
 export type LargestOrderItem = {
   productId: string;
   name: string;
@@ -81,6 +88,15 @@ function pickNumber(value: unknown): number | null {
     if (typeof maybe.low === "number") return maybe.low;
   }
   return null;
+}
+
+function isoWeekStart(period: string): string | null {
+  if (typeof period !== "string" || period.trim() === "") return null;
+  const date = new Date(`${period}T00:00:00Z`);
+  if (Number.isNaN(date.valueOf())) return null;
+  const mondayBased = (date.getUTCDay() + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - mondayBased);
+  return date.toISOString().slice(0, 10);
 }
 
 export async function getCategoryCounts(): Promise<CategoryCount[]> {
@@ -281,6 +297,85 @@ export async function getMonthlySales(
   } finally {
     await session.close();
   }
+}
+
+export async function getDailyDemandSeries(
+  limit: number = 90
+): Promise<DemandSeriesPoint[]> {
+  const session = driver.session();
+  try {
+    const safeLimit = Math.max(1, Math.floor(limit));
+    const result = await session.run(
+      `
+      MATCH (o:Order)
+      WITH
+        coalesce(o.OrderDate, o.CreatedAt) AS dt,
+        toFloat(coalesce(o.Total, 0)) AS total,
+        toFloat(coalesce(o.ItemCount, 0)) AS items
+      WHERE dt IS NOT NULL AND items > 0
+      WITH substring(toString(dt), 0, 10) AS period, total, items
+      WHERE period IS NOT NULL AND period <> "" AND period <> "null"
+      RETURN
+        period,
+        toFloat(count(*)) AS orders,
+        sum(items) AS items,
+        sum(total) AS revenue
+      ORDER BY period DESC
+      LIMIT toInteger($limit)
+      `,
+      { limit: safeLimit }
+    );
+
+    return result.records
+      .map((record: Neo4jRecord) => {
+        const period = String(record.get("period") ?? "");
+        const ordersValue = Number(record.get("orders"));
+        const itemsValue = Number(record.get("items"));
+        const revenueValue = Number(record.get("revenue"));
+
+        return {
+          period,
+          orders: Number.isFinite(ordersValue) ? Math.max(0, Math.floor(ordersValue)) : 0,
+          items: Number.isFinite(itemsValue) ? Math.max(0, Math.floor(itemsValue)) : 0,
+          revenue: Number.isFinite(revenueValue) ? Math.max(0, revenueValue) : 0,
+        };
+      })
+      .filter((entry) => entry.period && entry.items > 0)
+      .reverse();
+  } finally {
+    await session.close();
+  }
+}
+
+export async function getWeeklyDemandSeries(
+  limitWeeks: number = 26
+): Promise<DemandSeriesPoint[]> {
+  const safeWeeks = Math.max(1, Math.floor(limitWeeks));
+  const daily = await getDailyDemandSeries(safeWeeks * 14);
+
+  const totals = new Map<string, DemandSeriesPoint>();
+  daily.forEach((entry) => {
+    const weekStart = isoWeekStart(entry.period);
+    if (!weekStart) return;
+
+    const existing = totals.get(weekStart) ?? {
+      period: weekStart,
+      orders: 0,
+      items: 0,
+      revenue: 0,
+    };
+
+    existing.orders += entry.orders;
+    existing.items += entry.items;
+    existing.revenue += entry.revenue;
+    totals.set(weekStart, existing);
+  });
+
+  const series = Array.from(totals.values()).sort((a, b) =>
+    a.period.localeCompare(b.period)
+  );
+
+  return series.slice(Math.max(0, series.length - safeWeeks));
 }
 
 export async function getLargestOrderBreakdown(): Promise<LargestOrderBreakdown | null> {

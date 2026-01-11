@@ -5,6 +5,8 @@ import {
   Bar,
   BarChart,
   Cell,
+  Line,
+  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -273,6 +275,33 @@ export function MonthlySalesBarChartThumbnail({
           <Bar dataKey="start" stackId="waterfall" fill="transparent" />
           <Bar dataKey="value" stackId="waterfall" fill="#a855f7" radius={[0, 5, 5, 0]} />
         </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function SupplyPlanningThumbnail() {
+  const chartData = useMemo(
+    () => [
+      { x: 1, demand: 30, capacity: 44 },
+      { x: 2, demand: 38, capacity: 44 },
+      { x: 3, demand: 46, capacity: 44 },
+      { x: 4, demand: 42, capacity: 44 },
+      { x: 5, demand: 54, capacity: 44 },
+      { x: 6, demand: 49, capacity: 44 },
+    ],
+    []
+  );
+
+  return (
+    <div style={{ width: "100%", height: "100%" }}>
+      <ResponsiveContainer>
+        <LineChart data={chartData} margin={{ top: 10, right: 6, left: 6, bottom: 0 }}>
+          <XAxis dataKey="x" hide />
+          <YAxis hide />
+          <Line type="monotone" dataKey="demand" stroke="#16a34a" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="capacity" stroke="#111" strokeDasharray="4 4" dot={false} />
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );
