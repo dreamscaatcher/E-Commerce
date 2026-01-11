@@ -37,7 +37,7 @@ export default async function AdminOrdersPage({
   return (
     <div style={{ padding: "2rem" }}>
       <EntityTable
-        title="Admin Orders"
+        title="Backend Dashboard · Orders"
         items={orders}
         idKey="OrderID"
         linkPrefix="/admin/orders"
@@ -53,4 +53,3 @@ export default async function AdminOrdersPage({
     </div>
   );
 }
-

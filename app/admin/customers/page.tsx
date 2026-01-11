@@ -42,7 +42,7 @@ export default async function AdminCustomersPage({
   return (
     <div style={{ padding: "2rem" }}>
       <EntityTable
-        title="Admin Customers"
+        title="Backend Dashboard · Customers"
         items={customers}
         idKey="CustomerID"
         linkPrefix="/admin/customers"

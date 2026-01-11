@@ -37,7 +37,7 @@ export default async function AdminPaymentsPage({
   return (
     <div style={{ padding: "2rem" }}>
       <EntityTable
-        title="Admin Payments"
+        title="Backend Dashboard · Payments"
         items={payments}
         idKey="PaymentID"
         linkPrefix="/admin/payments"
@@ -53,4 +53,3 @@ export default async function AdminPaymentsPage({
     </div>
   );
 }
-

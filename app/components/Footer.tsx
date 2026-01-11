@@ -35,7 +35,7 @@ export default function Footer() {
       >
         <div style={{ minWidth: "220px" }}>
           <div style={{ fontWeight: 800, fontSize: "1.05rem" }}>
-            Neo4j Dashboard
+            Customer App
           </div>
           <p style={{ marginTop: "0.5rem", marginBottom: 0, color: "#444" }}>
             Browse products, manage your cart, and checkout with confidence.
@@ -116,7 +116,7 @@ export default function Footer() {
           fontSize: "0.875rem",
         }}
       >
-        <span>© {year} Neo4j Dashboard. All rights reserved.</span>
+        <span>© {year} Customer App. All rights reserved.</span>
         <span>Built with Next.js + Neo4j</span>
       </div>
     </footer>

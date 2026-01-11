@@ -117,7 +117,7 @@ export default function ProductEditor({ id }: { id: string }) {
   return (
     <div>
       <div style={{ marginBottom: "1rem" }}>
-        <Link href="/admin/products">← Back to Admin Products</Link>
+        <Link href="/admin/products">← Back to Products</Link>
       </div>
 
       <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>Edit Product</h1>

@@ -38,7 +38,7 @@ export default async function AdminProductsPage({
     <div style={{ padding: "2rem" }}>
       <AdminProductsToolbar />
       <EntityTable
-        title="Admin Products"
+        title="Backend Dashboard · Products"
         items={products}
         idKey="ProductID"
         linkPrefix="/admin/products"

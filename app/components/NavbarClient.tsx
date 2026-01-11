@@ -3,7 +3,6 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import NavbarLogoutButton from "./NavbarLogoutButton";
 import CustomerLogoutButton from "./CustomerLogoutButton";
 import { getCartCount, getCartItems, subscribeToCartUpdates } from "../lib/cart";
 
@@ -37,12 +36,16 @@ export default function NavbarClient({
         color: "#111",
       }}
     >
-      <Link href="/" className="navLink" style={{ fontWeight: 600 }}>
-        Neo4j Dashboard
+      <Link
+        href={isAdminArea ? "/admin" : "/"}
+        className="navLink"
+        style={{ fontWeight: 600 }}
+      >
+        {isAdminArea ? "Backend Dashboard" : "Customer App"}
       </Link>
 
-      <Link href="/" className="navLink">
-        Home
+      <Link href={isAdminArea ? "/admin" : "/"} className="navLink">
+        {isAdminArea ? "Overview" : "Home"}
       </Link>
 
       {showAdminNav ? (
@@ -64,7 +67,9 @@ export default function NavbarClient({
           </Link>
 
           <div style={{ marginLeft: "auto" }}>
-            <NavbarLogoutButton />
+            <Link href="/" className="navButton">
+              Customer App
+            </Link>
           </div>
         </>
       ) : (
@@ -72,6 +77,9 @@ export default function NavbarClient({
           <Link href="/products" className="navLink">
             Products
           </Link>
+          <a href="/admin" className="navLink">
+            Backend Dashboard
+          </a>
           <div
             style={{
               marginLeft: "auto",

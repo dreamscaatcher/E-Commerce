@@ -4,8 +4,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
-  title: "Neo4j Dashboard",
-  description: "Browse and manage Neo4j data from your browser",
+  title: "Customer App",
+  description: "Browse products and place orders",
 };
 
 export default function RootLayout({
